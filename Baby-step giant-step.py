@@ -19,8 +19,12 @@ while True:
 
 print('Введите a')
 a = int(input())
-print('Введите b')
-b = int(input())
+b = 9999**99
+
+while (b>p):
+    print('Введите b < p')
+    b = int(input())
+
 
 H = int(p ** (1 / 2)) + 1
 
@@ -63,8 +67,6 @@ for key in u:
             break #чтобы не перебирать словари до упора, выход из цикла при первом найденном x
 
 print()
-if x == 0:
-    print(0)
-else:
-    print(a, "^", x, " = ", b, "mod(", p, ")")
+
+print(a, "^", x, " = ", b, "mod(",p, ")")
 
