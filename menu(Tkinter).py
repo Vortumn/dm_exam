@@ -16,8 +16,16 @@ def Evk(a,b):               #расширенный алгоритм Евкли�
     return xa
 
 
+def isPrime(n): #проверка на простоту числа
+    if n % 2 == 0:
+        return n == 2
+    d = 3
+    for i in range(d, math.ceil(math.sqrt(n)) + 1, 2):
+        if (n %  d == 0):
+            return False
+    return True
+
 def isSimple(n): #проверка на простоту числа
-    n = int(n)
     if n % 2 == 0:
         return n == 2
     d = 3
@@ -39,7 +47,7 @@ def Factor(n): #складывание простых множителей в м
        Ans.append(n)
    return Ans
 
-#---------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------
 
 def baby_giant():
 
@@ -50,49 +58,24 @@ def baby_giant():
         b = int(b)
         p = int(p)
 
-        H = int(p ** (1 / 2)) + 1
+        H = int(math.sqrt(p)) + 1
 
         # print('H = ', H)
 
         c = (a ** H) % p
-        # print('c = ', c)
-        u = {}
-        v = {}
-        u[0] = 0
+        # kinda magic
+        u = sorted([(i, (c ** i) % p) for i in range(1, H + 1)], key=lambda item: item[1])
+        v = sorted([(i, (b * a ** i) % p) for i in range(H + 1)], key=lambda item: item[1])
 
-        for i in range(1, H + 1):
-            u[i] = ((c ** i) % p)
-        u = list(u.items())
-        u.sort(key=lambda item: item[1])  # магия для сортировок значений по возрастанию с сохранением их ключа
-        u = dict(u)
-
-        for k in range(H + 1):  # магия для сортировок значений по возрастанию с сохранением их ключа
-            v[k] = ((b * (a ** k)) % p)
-        v = list(v.items())
-        v.sort(key=lambda item: item[1])
-        v = dict(v)
-
-        # print(u)
-        # print(v)
-
-        # x = []
-        x = 0
-
-        # нужно хранить индексы для совпадающих элементов(u и v)
-        # хотя по сути достаточно найти первые совпадающие элементы и по одному u, v
-        # x = H*u - v (mod p-1)
-
-        for key in u:
-            for keys in v:
-                if v[keys] == u[key]:
-                    # x.append((H*key - keys) % (p-1))
-                    x = (H * key - keys) % (p - 1)
-                    break  # чтобы не перебирать словари до упора, выход из цикла при первом найденном x
-
-
-
-
-        text = str(a)+"^"+str(x)+" = "+str(b)+" mod("+str(p)+")"  #вставить текст
+        for i in u:
+            for j in v:
+                if i[1] == j[1]:
+                    x = (i[0] * H - j[0]) % (p - 1)
+                    break
+        try:
+            text = str(a) + "^" + str(x) + " = " + str(int(b)) + " mod(" + str(p) + ")"  # вставить текст
+        except:
+            text = "Нет решения"
         return text
 
     def inserter(value):
@@ -112,7 +95,7 @@ def baby_giant():
 
             else:
 
-                if(isSimple(p_val)!=True):
+                if(isPrime(p_val)!=True):
                     inserter("Введите простое p")
                 else:
                     inserter(alg(a_val, b_val,p_val))
