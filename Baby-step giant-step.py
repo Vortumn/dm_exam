@@ -1,13 +1,5 @@
 import math
-
-def isPrime(n): #проверка на простоту числа
-    if n % 2 == 0:
-        return n == 2
-    d = 3
-    for i in range(d, math.ceil(math.sqrt(n)) + 1, 2):
-        if (n %  d == 0):
-            return False
-    return True
+from primal import isPrime
 
 print("Поиск решения уравнения a^x = b (mod p)")
 
