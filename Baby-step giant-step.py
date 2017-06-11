@@ -28,21 +28,20 @@ while (b>p):
 
 
 H = int(math.sqrt(p)) + 1
-print("H Is ", H)
 
 #print('H = ', H)
 
 c = (a ** H) % p
-#print('c = ', c)
 # kinda magic
 u = sorted([(i, (c ** i) % p) for i in range(1, H + 1)], key = lambda item: item[1])
-v = sorted([(i, b * a ** i) for i in range(H + 1)], key = lambda item: item[1])
-
+v = sorted([(i, (b * a ** i) % p) for i in range(H + 1)], key = lambda item: item[1])
 
 for i in u:
     for j in v:
         if i[1] == j[1]:
             x = (i[0] * H - j[0]) % (p - 1)
             break
-
-print("{}^{} = {} (mod  {})".format(a, x, b, p))
+try:
+    print("{}^{} = {} (mod  {})".format(a, x, b, p))
+except:
+    print("Нет решения")
