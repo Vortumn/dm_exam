@@ -1,5 +1,7 @@
 from tkinter import *
 import math
+from primal import isPrime
+from primal import factorized
 
 def Evk(a,b):               #расширенный алгоритм Евклида
     (xa,ya) = (1,0)
@@ -16,14 +18,6 @@ def Evk(a,b):               #расширенный алгоритм Евкли�
     return xa
 
 
-def isPrime(n): #проверка на простоту числа
-    if n % 2 == 0:
-        return n == 2
-    d = 3
-    for i in range(d, math.ceil(math.sqrt(n)) + 1, 2):
-        if (n %  d == 0):
-            return False
-    return True
 
 def isSimple(n): #проверка на простоту числа
     if n % 2 == 0:
@@ -120,11 +114,10 @@ def baby_giant():
     p.grid(row=1, column = 5)
     p_lab = Label(frame, text = "Введите p").grid(row=1,column = 6)
 
-    but = Button(frame, text="Рассчитать", width=11, command=handler).grid(row=1, column=7, padx=(9, 0))
+    but = Button(frame, text="Рассчитать", width=11, command=handler).grid(row=1, column=7, padx=(8, 0))
 
     # место для вывода решения уравнения
-    output = Text(frame, bg="darkred", font="Arial 12", width=65, height=20)
-
+    output = Text(frame, bg="darkred", font="Arial 14", width=54, height=14)
     output.grid(row=2, columnspan=8)
 
 #--------------------------------------------------------------------------------------------------------------------------
@@ -138,21 +131,9 @@ def pohlig_hell():
         b = int(b)
         p = int(p)
 
-        thisone = set(Factor(p - 1))  # множество элементов из factor, чтобы выделить q(без повторов)
-
-        # теперь нужно как-то посчитать a[i] для q[i] (степень)
-        # для этого напишем словарь, в который поместим элементы множества ключами, а в значении будем держать степень
-        qi = dict()
-
-        # пока что заполим значения нулями
-        for keys in thisone:
-            qi[keys] = 0
-
-        for k in Factor(p - 1):
-            if k in qi:
-                qi[k] += 1  # будем накручивать счётчик, когда ключ встречается в thisone
-        # теперь имеется словарь, который учитывает степень простых множителей
-
+        _factorization = factorized(p - 1)
+        qi = {i: _factorization.count(i) for i in set(_factorization)}  # qi - словарь, ключ - множитель в разложении,
+        # значение - степень.
         b0 = b
 
         r = dict()  # создаем словарь для ri, там будет хитрость
@@ -160,8 +141,9 @@ def pohlig_hell():
 
         for key in qi:
             for j in range(key):
-                tup.append(int((a ** (j * (p - 1) / key)) % p))  # складываем в словарь значения для a в разных степенях
+                tup.append(a ** (j * (p - 1) // key) % p)  # складываем в словарь значения для a в разных степенях
             r[key] = tuple(tup)
+            print(r[key])
             tup.clear()
 
         # теперь r - таблица значений для поиска a
@@ -177,27 +159,33 @@ def pohlig_hell():
         # теперь одна из самых громоздких функций в коде
 
         for q in r:
-            b_i = int((b ** ((p - 1) / q)) % p)  # нашли первую b_i для x0
+            # print("q is ", q)
+            b_i = b ** ((p - 1) // q) % p  # нашли первую b_i для x0
+            # print(b_i)
             for k in range(q):
-                if r[q][k] == int(b_i):
-                    x.append(k)  # нахождение x0
+                if (r[q][k] == int(b_i)):
+                    x.append(k)
             degree = 0  # нахождение массива x1...xi
-            for j in range(q - 1):
-                degree -= x[j] * (q ** j)
-                b_i = ((b * a ** degree) ** ((p - 1) / (q ** (j + 2)))) % p
+
+            for j in range(qi[q] - 1):
+                degree += x[j] * q ** j
+                b_i = (b // a ** degree) ** ((p - 1) // q ** (j + 2)) % p
+                # print("here b_i is ", b_i)
                 for k in range(q):
-                    if r[q][k] == int(b_i):
+                    if (r[q][k] == int(b_i)):
                         x.append(k)  # нахождение x[j+1]
 
             xx = 0
+            # print("len is ", len(x))
             for i in range(len(x)):
-                xx += x[i] * (q ** i)
+                xx += x[i] * q ** i
+            # print("xx is ", xx)
 
             # не так всё просто, в модуле нужно учитывать степень, поэтому
             deg = qi[q]
             chineese_theorem[q ** deg] = xx
 
-            x.clear()  # очищаем массив
+            x = []  # очищаем массив
 
         # и, наконец, реализация китайской теоремы об остатках через алгоритм Гаусса
         M = 1
@@ -262,7 +250,7 @@ def pohlig_hell():
     but = Button(frame, text="Рассчитать", width=11, command=handler).grid(row=1, column=7, padx=(9, 0))
 
     # место для вывода решения уравнения
-    output = Text(frame, bg="darkred", font="Arial 12", width=65, height=20)
+    output = Text(frame, bg="darkred", font="Arial 14", width=54, height=14)
 
     output.grid(row=2, columnspan=8)
 
