@@ -3,6 +3,16 @@ from primal import isPrime
 
 print("Поиск решения уравнения a^x = b (mod p)")
 
+def binSearch(a, elem):
+    left = 0
+    right = len(a) - 1
+    while (left < right):
+        middle = (left + right) // 2
+        if (a[middle] < elem):
+            left = middle
+        else:
+            right = middle
+    return middle
 
 while True:
     print('Введите простое число p')
